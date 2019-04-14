@@ -4,6 +4,6 @@ COPY src /opt/app/
 
 WORKDIR opt/app
 
-RUN javac *.java
+RUN javac br/pucrs/distribuida/p2p/*.java
 
 
