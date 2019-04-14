@@ -1,5 +1,4 @@
 package br.pucrs.distribuida.p2p;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 

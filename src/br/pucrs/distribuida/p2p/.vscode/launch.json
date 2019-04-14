@@ -11,7 +11,7 @@
             "request": "launch",
             "mainClass": "App",
             // "args": "192.168.0.6 fileTeste 127.0.0.2",
-            "args": "192.168.0.6",
+            "args": "3000",
             "projectName": "p2p_2da16410",
             "console": "integratedTerminal"
         },

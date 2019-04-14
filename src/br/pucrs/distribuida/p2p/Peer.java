@@ -1,4 +1,3 @@
-
 package br.pucrs.distribuida.p2p;
 
 import java.io.IOException;
@@ -31,7 +30,7 @@ public class Peer {
                 while (true) {
                     try {
                         sendMessageToSuperNode(msg);
-                        Thread.sleep(15000);
+                        Thread.sleep(200000);
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (InterruptedException e) {
