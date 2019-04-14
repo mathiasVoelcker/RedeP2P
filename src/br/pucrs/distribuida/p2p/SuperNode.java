@@ -23,7 +23,7 @@ public class SuperNode {
         this.peers = new HashMap<String, Peer>();
         this.awaitingResponse = false;
         this.address = InetAddress.getByName(ip);
-        multicastSocket = new MulticastSocket(Integer.parseInt(ip));
+        multicastSocket = new MulticastSocket(5000);
         this.group = InetAddress.getByName("230.0.0.1");
         multicastSocket.joinGroup(this.group);
         // unicastSocket = new DatagramSocket(Integer.parseInt(ip));
