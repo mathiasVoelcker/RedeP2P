@@ -1,10 +1,10 @@
-all:			SuperNode.class Peer.class App.class
-
-SuperNode.class:		SuperNode.java
-			@javac SuperNode.java
+all:		 Peer.class SuperNode.class App.class
 
 Peer.class:	Peer.java
 			@javac Peer.java
+
+SuperNode.class:		SuperNode.java
+			@javac SuperNode.java
 
 App.class:	App.java
 			@javac App.java

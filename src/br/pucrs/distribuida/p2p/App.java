@@ -11,7 +11,7 @@ Para rodar a aplicação como Peer, basta digitar
     Java App [ipSuperNodo] [fileName] [ipPeer]
 */
 public class App {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         Role role = Role.SuperNode;
         String ipSuperNode = args[0];
         if (args.length > 1) {
@@ -20,6 +20,7 @@ public class App {
             String fileName = args[1];
             String ip = args[2];
             Peer peer = new Peer(ip, fileName, null, ipSuperNode);
+            peer.declareToSuperNode().start();
             Scanner scanner = new Scanner(System.in);
             while (true) {
                 System.out.println("What do you want to say?");

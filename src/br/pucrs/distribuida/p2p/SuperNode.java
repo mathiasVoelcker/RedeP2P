@@ -23,15 +23,13 @@ public class SuperNode {
         this.address = InetAddress.getByName(ip);
         multicastSocket = new MulticastSocket(5001);
         unicastSocket = new DatagramSocket(5000);
-        // multicastSocket.bind(new InetSocketAddress(ip, 5001));
-        // unicastSocket.bind(new InetSocketAddress(ip, 5000));
         byte[] input = new byte[256];
         packet = new DatagramPacket(input, input.length);
     }
 
     public void run() {
         listenUnicast().start();
-        listenMulticast().start();
+        // listenMulticast().start();
     }
 
     public void AddPeer(Peer peer) {
@@ -53,6 +51,7 @@ public class SuperNode {
                             Peer receivedPeer = new Peer(peerData[0], peerData[1], peerData[2], ip);
                             peers.put(receivedPeer.getIp(), receivedPeer);
                         }
+                        System.out.println(peers.values().size());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

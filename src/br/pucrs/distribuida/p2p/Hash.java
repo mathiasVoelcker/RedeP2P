@@ -10,6 +10,5 @@ public class Hash {
         MessageDigest messageDigest = MessageDigest.getInstance("MD5");
         messageDigest.update(messageBytes);
         return messageDigest.digest();
-
     }
 }
