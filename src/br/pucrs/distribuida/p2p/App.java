@@ -1,12 +1,13 @@
+package br.pucrs.distribuida.p2p;
+
 import java.io.IOException;
 import java.util.Scanner;
-
 
 
 /*Para rodar a aplicação como superNode, basta digitar:
     java App [ip]
 
-Para rocar a aplicação como Peer, basta digitar
+Para rodar a aplicação como Peer, basta digitar
     Java App [ipSuperNodo] [fileName] [ipPeer]
 */
 public class App {
@@ -22,9 +23,9 @@ public class App {
             Scanner scanner = new Scanner(System.in);
             while (true) {
                 System.out.println("What do you want to say?");
-                peer.sendMessageToSuperNode(scanner.nextLine()); 
+                peer.sendMessageToSuperNode(scanner.nextLine());
             }
-            
+
         } else {
             System.out.println("SuperNode selected");
             new SuperNode(ipSuperNode).run();

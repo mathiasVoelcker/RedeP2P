@@ -1,3 +1,5 @@
+package br.pucrs.distribuida.p2p;
+
 import java.util.Map;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -26,7 +28,7 @@ public class SuperNode {
         byte[] input = new byte[256];
         packet = new DatagramPacket(input, input.length);
     }
-    
+
     public void run() {
         listenUnicast().start();
         listenMulticast().start();
@@ -45,7 +47,7 @@ public class SuperNode {
                         System.out.println("waiting");
                         unicastSocket.receive(packet);
                         String received = new String(packet.getData(), 0, packet.getLength());
-                        System.out.println("Received: "+ received);
+                        System.out.println("Received: " + received);
                         if (received.contains("My data: ")) {
                             String[] peerData = received.replace("My data: ", "").split("-");
                             Peer receivedPeer = new Peer(peerData[0], peerData[1], peerData[2], ip);
@@ -68,7 +70,7 @@ public class SuperNode {
                         System.out.println("waiting");
                         multicastSocket.receive(packet);
                         String received = new String(packet.getData(), 0, packet.getLength());
-		                System.out.println("Received in multicast: "+ received);
+                        System.out.println("Received in multicast: " + received);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -77,7 +79,7 @@ public class SuperNode {
         };
     }
 
-	public String getIp() {
-		return this.ip;
-	}
+    public String getIp() {
+        return this.ip;
+    }
 }

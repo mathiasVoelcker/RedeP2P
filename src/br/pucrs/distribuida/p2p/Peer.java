@@ -1,3 +1,5 @@
+package br.pucrs.distribuida.p2p;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -21,20 +23,19 @@ public class Peer {
     }
 
     public void run() throws InterruptedException, IOException {
-        while(true) {
+        while (true) {
             sendMessageToSuperNode("My data: " + this.ip + "-" + this.fileName + "-" + this.hash);
             Thread.sleep(5000);
         }
     }
 
     public void sendMessageToSuperNode(String message) throws IOException {
-        byte[] output = new byte[256];
-        output = message.getBytes();
+        byte[] output = message.getBytes();
         this.packet = new DatagramPacket(
-                                    output, 
-                                    output.length, 
-                                    InetAddress.getByName(this.ipSuperNode),
-                                    5000);
+                output,
+                output.length,
+                InetAddress.getByName(this.ipSuperNode),
+                5000);
         this.socket.send(packet);
     }
 
