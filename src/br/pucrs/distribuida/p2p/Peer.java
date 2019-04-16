@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketTimeoutException;
 import java.util.Scanner;
 
 public class Peer {
@@ -32,9 +33,14 @@ public class Peer {
             this.sendMessageToSuperNode(msg);
             byte[] input = new byte[256];
             DatagramPacket packet = new DatagramPacket(input, input.length);
-            this.socket.receive(packet);
-            String received = new String(packet.getData(),0,packet.getLength());
-            System.out.println("Received: " + received);
+            try {
+                this.socket.setSoTimeout(3000);
+                this.socket.receive(packet);
+                String received = new String(packet.getData(),0,packet.getLength());
+                System.out.println("Received: " + received);
+            } catch(SocketTimeoutException e) {
+                System.out.println("Hash not found in network");
+            }
         }
     }
 
