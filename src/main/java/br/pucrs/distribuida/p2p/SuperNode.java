@@ -21,7 +21,7 @@ public class SuperNode {
     public static final String SUPERNODE_REQUEST_CODE = "Looking for resource: ";
     public static final String SUPERNODE_RESPONSE_CODE = "Found resource: ";
 
-    public static final String KEEP_ALIVE = "Keep alive: ";
+    public static final String KEEP_ALIVE = "Keep alive:";
     public static final Integer PORT = 5000;
 
     private final Lock lock = new ReentrantLock();
@@ -73,10 +73,13 @@ public class SuperNode {
                         // Se recebe uma resposta de um supernodo informando que achou
                         else if (received.contains(SUPERNODE_RESPONSE_CODE)) {
                             responseToPeer(received);
+
                         } else if (received.contains(KEEP_ALIVE)) {
+                            System.out.println("KEEP ALIVE FUNCIONOU");
                         }
                         // Se recebe uma requisição do Peer
                         else {
+                            System.out.println("BUSCA BOMBOU");
                             requestToSupernodes(received);
                         }
                     } catch (IOException e) {
@@ -89,7 +92,7 @@ public class SuperNode {
                 String treatedData = received.replace("My data: ", "");
                 Resource resource = gson.fromJson(treatedData, Resource.class);
                 resources.add(resource);
-                //registeredIps
+                registeredIps.put(resource.getIp(), 10);
             }
 
             public void requestToSupernodes(String received) throws IOException {
@@ -98,6 +101,14 @@ public class SuperNode {
                 String ip = data[data.length - 1];
                 for (int i = 0; i < data.length - 2; i++) {
                     String msg = SUPERNODE_REQUEST_CODE + data[i] + "###" + ip;
+                    System.out.println(msg);
+                    byte[] output = msg.getBytes();
+                    DatagramPacket groupPacket = new DatagramPacket(output, output.length, group, PORT);
+                    multicastSocket.send(groupPacket);
+                }
+                if (data.length <= 2) {
+                    String msg = SUPERNODE_REQUEST_CODE + data[0] + "###" + ip;
+                    System.out.println(msg);
                     byte[] output = msg.getBytes();
                     DatagramPacket groupPacket = new DatagramPacket(output, output.length, group, PORT);
                     multicastSocket.send(groupPacket);
@@ -107,12 +118,14 @@ public class SuperNode {
 
             public void responseToSupernode(String received) throws IOException {
                 String data = received.replace(SUPERNODE_REQUEST_CODE, "");
+                System.out.println(data);
                 String[] auxArray = data.split("###");
                 String resourceName = auxArray[0];
                 String ip = auxArray[1];
                 if (containsResource(resourceName)) {
                     String msg = SUPERNODE_RESPONSE_CODE + gson.toJson(findResourcesByName(resourceName)) + "###" + ip;
                     byte[] output = msg.getBytes();
+                    System.out.println(msg);
                     DatagramPacket groupPacket = new DatagramPacket(output, output.length, group, PORT);
                     multicastSocket.send(groupPacket);
                 }
@@ -123,10 +136,11 @@ public class SuperNode {
                 String[] data = received.replace(SUPERNODE_RESPONSE_CODE, "").split("###");
                 Resource[] resourceList = gson.fromJson(data[0], Resource[].class);
                 String requestingIp = data[1];
+                System.out.println("era pra responder");
                 if (registeredIps.containsKey(requestingIp)) {
                     for (Resource resource : resourceList) {
-
-                        String msg = String.format("Found resource: %s, with hash: %, at ip: %s",
+                        System.out.println("respondeu");
+                        String msg = String.format("Found resource: %s, with hash: %s, at ip: %s",
                                 resource.getFileName(), resource.getHash(), resource.getIp());
 
                         byte[] output = msg.getBytes();
@@ -149,8 +163,13 @@ public class SuperNode {
 
     private synchronized List<Resource> findResourcesByName(String resourceName) {
         List<Resource> foundResources = new ArrayList<>();
-        resources.stream()
-                .filter(resource -> foundResources.add(resource));
+
+        for (Resource resource : resources) {
+            System.out.println(resource.toString());
+            if(resource.getFileName().equals(resourceName))
+                foundResources.add(resource);
+        }
+
         return foundResources;
     }
 }

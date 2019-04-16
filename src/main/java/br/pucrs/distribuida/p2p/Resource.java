@@ -38,4 +38,12 @@ public class Resource {
         this.fileName = fileName;
     }
 
+    @Override
+    public String toString() {
+        return "Resource{" +
+                "fileName='" + fileName + '\'' +
+                ", hash='" + hash + '\'' +
+                ", ip='" + ip + '\'' +
+                '}';
+    }
 }

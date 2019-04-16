@@ -74,7 +74,7 @@ public class Peer {
             }
             while (true) {
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(50000);
                     sendMessageToSuperNode("Keep alive: " + ip);
                 } catch (Exception e) {
                     e.printStackTrace();

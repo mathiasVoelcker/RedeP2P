@@ -13,9 +13,9 @@ Para um Peer solicitar ip de uma outra Peer, basta escrever o hash ou nome do ar
 */
 public class App {
     public static void main(String[] args) throws IOException, InterruptedException, NoSuchAlgorithmException {
-        if (args.length < 0) {
+        if (args.length == 0) {
             System.out.println("Not enough arguments.");
-            System.exit(0);
+            System.exit(1);
         }
         String ipSuperNode = args[0];
         if (args.length > 1) {
