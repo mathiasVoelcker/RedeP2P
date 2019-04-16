@@ -1,10 +1,15 @@
 package br.pucrs.distribuida.p2p;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Peer {
@@ -23,7 +28,7 @@ public class Peer {
         this.ipSuperNode = ipSuperNode;
     }
 
-    public void run() throws InterruptedException, IOException {
+    public void run() throws InterruptedException, IOException, NoSuchAlgorithmException {
         this.socket = new DatagramSocket(5000);
         this.declareToSuperNode().start();
         Scanner scanner = new Scanner(System.in);
@@ -36,12 +41,25 @@ public class Peer {
             try {
                 this.socket.setSoTimeout(3000);
                 this.socket.receive(packet);
-                String received = new String(packet.getData(),0,packet.getLength());
+                String received = new String(packet.getData(), 0, packet.getLength());
                 System.out.println("Received: " + received);
-            } catch(SocketTimeoutException e) {
+            } catch (SocketTimeoutException e) {
                 System.out.println("Hash not found in network");
             }
         }
+    }
+
+    public List<FileHash> getFileHashes() throws NoSuchAlgorithmException, FileNotFoundException {
+        File folder = new File("/opt/files");
+        File[] listOfFiles = folder.listFiles();
+        List<FileHash> fileHashList = new ArrayList<>();
+        for (File file : listOfFiles) {
+            if (file.isFile()) {
+                System.out.println(file.getName());
+                fileHashList.add(new FileHash(file.getName(), Hash.hashMessage(file)));
+            }
+        }
+        return fileHashList;
     }
 
     public Thread declareToSuperNode() throws InterruptedException, IOException {
@@ -51,11 +69,15 @@ public class Peer {
             public void run() {
                 while (true) {
                     try {
-                        sendMessageToSuperNode(msg);
-                        Thread.sleep(200000);
+                        for (FileHash fileHash : getFileHashes()) {
+                            sendMessageToSuperNode("My data: " + ip + "-" + fileHash.getFileName() + "-" + fileHash.getHash());
+                        }
+                        Thread.sleep(20000);
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (NoSuchAlgorithmException e) {
                         e.printStackTrace();
                     }
                 }
@@ -73,9 +95,9 @@ public class Peer {
         this.socket.send(packet);
     }
 
-    public String toString() {
-        return "My data: " + ip + "-" + fileName + "-" + hash;
-    }
+    // public String toString() {
+    //     return "My data: " + ip + "-" + fileName + "-" + hash;
+    // }
 
     public String getIp() {
         return this.ip;

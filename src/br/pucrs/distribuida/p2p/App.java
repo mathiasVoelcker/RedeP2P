@@ -1,7 +1,6 @@
 package br.pucrs.distribuida.p2p;
 import java.io.IOException;
-import java.util.Scanner;
-
+import java.security.NoSuchAlgorithmException;
 
 /*Para rodar a aplicação como superNode, basta digitar:
     java App [ip]
@@ -12,7 +11,7 @@ Para rodar a aplicação como Peer, basta digitar
 Para um Peer solicitar ip de uma outra Peer, basta escrever o hash ou nome do arquivo da Peer desejada
 */
 public class App {
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException, InterruptedException, NoSuchAlgorithmException {
         String ipSuperNode = args[0];
         if (args.length > 1) {
             System.out.println("Peer selected");

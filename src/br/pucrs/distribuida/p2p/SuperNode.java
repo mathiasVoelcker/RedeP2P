@@ -106,6 +106,8 @@ public class SuperNode {
 
             public void responseToPeer(String received) throws IOException {
                 String hash = received.replace(SUPERNODE_RESPONSE_CODE, "").split("-")[0];
+                System.out.println(hash);
+                System.out.println(requestedHash);
                 if (requestedHash.equals(hash)) {
                     String ip = received.split("-IP: ")[1];
                     String msg = PEER_RESPONSE + ip;
