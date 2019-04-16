@@ -7,7 +7,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class Hash {
-
+        //Por alguma razao sempre retorna o mesmo hash
     public static String hashMessage(File file) throws NoSuchAlgorithmException, FileNotFoundException {
         try {
             MessageDigest digest = MessageDigest.getInstance("MD5");
