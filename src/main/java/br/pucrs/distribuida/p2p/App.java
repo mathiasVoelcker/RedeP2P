@@ -1,4 +1,5 @@
 package br.pucrs.distribuida.p2p;
+
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
@@ -12,6 +13,10 @@ Para um Peer solicitar ip de uma outra Peer, basta escrever o hash ou nome do ar
 */
 public class App {
     public static void main(String[] args) throws IOException, InterruptedException, NoSuchAlgorithmException {
+        if (args.length < 0) {
+            System.out.println("Not enough arguments.");
+            System.exit(0);
+        }
         String ipSuperNode = args[0];
         if (args.length > 1) {
             System.out.println("Peer selected");
@@ -21,7 +26,7 @@ public class App {
             peer.run();
         } else {
             System.out.println("SuperNode selected");
-            new SuperNode(ipSuperNode).run();
+            new SuperNode().run();
         }
     }
 }

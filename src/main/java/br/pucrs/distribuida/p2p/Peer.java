@@ -1,5 +1,7 @@
 package br.pucrs.distribuida.p2p;
 
+import com.google.gson.Gson;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -16,7 +18,6 @@ public class Peer {
 
     private String ip;
     private String fileName;
-    private String hash;
     private String ipSuperNode;
     private DatagramSocket socket;
     private DatagramPacket packet;
@@ -24,7 +25,7 @@ public class Peer {
     public Peer(String ip, String fileName, String hash, String ipSuperNode) throws IOException {
         this.ip = ip;
         this.fileName = fileName;
-        this.hash = hash;
+
         this.ipSuperNode = ipSuperNode;
     }
 
@@ -33,8 +34,8 @@ public class Peer {
         this.declareToSuperNode().start();
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.println("What are you looking for");
-            String msg = scanner.nextLine() + "-IP: " + ip;
+            System.out.println("Inform the resources you're looking for divided in single white spaces: ");
+            String msg = scanner.nextLine() + " " + ip;
             this.sendMessageToSuperNode(msg);
             byte[] input = new byte[256];
             DatagramPacket packet = new DatagramPacket(input, input.length);
@@ -44,45 +45,42 @@ public class Peer {
                 String received = new String(packet.getData(), 0, packet.getLength());
                 System.out.println("Received: " + received);
             } catch (SocketTimeoutException e) {
-                System.out.println("Hash not found in network");
+                System.out.println("Resource(s) not found in network");
             }
         }
     }
 
-    public List<FileHash> getFileHashes() throws NoSuchAlgorithmException, FileNotFoundException {
+    public List<Resource> getFileHashes() throws NoSuchAlgorithmException, FileNotFoundException {
         File folder = new File("/opt/files");
         File[] listOfFiles = folder.listFiles();
-        List<FileHash> fileHashList = new ArrayList<>();
+        List<Resource> resourceList = new ArrayList<>();
         for (File file : listOfFiles) {
             if (file.isFile()) {
                 System.out.println(file.getName());
-                fileHashList.add(new FileHash(file.getName(), Hash.hashMessage(file)));
+                resourceList.add(new Resource(file.getName(), Hash.hashMessage(file), ip));
             }
         }
-        return fileHashList;
+        return resourceList;
     }
 
-    public Thread declareToSuperNode() throws InterruptedException, IOException {
-        String msg = this.toString();
-        return new Thread() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        for (FileHash fileHash : getFileHashes()) {
-                            sendMessageToSuperNode("My data: " + ip + "-" + fileHash.getFileName() + "-" + fileHash.getHash());
-                        }
-                        Thread.sleep(20000);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (NoSuchAlgorithmException e) {
-                        e.printStackTrace();
-                    }
+    public Thread declareToSuperNode() {
+        return new Thread(() -> {
+            try {
+                for (Resource resource : getFileHashes()) {
+                    sendMessageToSuperNode("My data: " + new Gson().toJson(resource));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            while (true) {
+                try {
+                    Thread.sleep(5000);
+                    sendMessageToSuperNode("Keep alive: " + ip);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
-        };
+        });
     }
 
     public void sendMessageToSuperNode(String message) throws IOException {
@@ -95,15 +93,13 @@ public class Peer {
         this.socket.send(packet);
     }
 
-    // public String toString() {
-    //     return "My data: " + ip + "-" + fileName + "-" + hash;
-    // }
+    @Override
+    public String toString() {
+        return "My data: " + ip + "-" + fileName;
+    }
 
     public String getIp() {
         return this.ip;
     }
 
-    public String getHash() {
-        return this.hash;
-    }
 }
