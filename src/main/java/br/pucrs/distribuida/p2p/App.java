@@ -7,7 +7,7 @@ import java.security.NoSuchAlgorithmException;
     java App [ip]
 
 Para rodar a aplicação como Peer, basta digitar
-    Java App [ipSuperNodo] [fileName] [ipPeer]
+    Java App [ipSuperNodo] [ipPeer]
 
 Para um Peer solicitar ip de uma outra Peer, basta escrever o hash ou nome do arquivo da Peer desejada
 */
@@ -20,9 +20,8 @@ public class App {
         String ipSuperNode = args[0];
         if (args.length > 1) {
             System.out.println("Peer selected");
-            String fileName = args[1];
-            String ip = args[2];
-            Peer peer = new Peer(ip, fileName, fileName, ipSuperNode);
+            String ip = args[1];
+            Peer peer = new Peer(ip, ipSuperNode);
             peer.run();
         } else {
             System.out.println("SuperNode selected");

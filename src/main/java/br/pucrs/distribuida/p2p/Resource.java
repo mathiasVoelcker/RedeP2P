@@ -13,6 +13,10 @@ public class Resource {
         this.ip = ip;
     }
 
+    public Resource() {
+
+    }
+
     public String getIp() {
         return ip;
     }

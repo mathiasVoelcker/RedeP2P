@@ -106,14 +106,6 @@ public class SuperNode {
                     DatagramPacket groupPacket = new DatagramPacket(output, output.length, group, PORT);
                     multicastSocket.send(groupPacket);
                 }
-                if (data.length <= 2) {
-                    String msg = SUPERNODE_REQUEST_CODE + data[0] + "###" + ip;
-                    System.out.println(msg);
-                    byte[] output = msg.getBytes();
-                    DatagramPacket groupPacket = new DatagramPacket(output, output.length, group, PORT);
-                    multicastSocket.send(groupPacket);
-                }
-
             }
 
             public void responseToSupernode(String received) throws IOException {
@@ -159,7 +151,7 @@ public class SuperNode {
 
     private synchronized boolean containsResource(String resourceName) {
         return resources.stream()
-                .anyMatch(resource -> resource.getFileName().equals(resourceName));
+                .anyMatch(resource -> resource.getFileName().contains(resourceName));
     }
 
     private synchronized List<Resource> findResourcesByName(String resourceName) {
@@ -167,7 +159,7 @@ public class SuperNode {
 
         for (Resource resource : resources) {
             System.out.println(resource.toString());
-            if (resource.getFileName().equals(resourceName))
+            if (resource.getFileName().contains(resourceName))
                 foundResources.add(resource);
         }
 
@@ -193,7 +185,7 @@ public class SuperNode {
 
             for (String key : keyList) {
                 Integer currentTime = registeredIps.get(key);
-                if(currentTime == null)
+                if (currentTime == null)
                     continue;
                 currentTime--;
                 System.out.println("ip : " + key + "has still : " + currentTime);
