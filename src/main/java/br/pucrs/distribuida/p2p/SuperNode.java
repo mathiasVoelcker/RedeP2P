@@ -22,7 +22,6 @@ public class SuperNode {
     public static final String KEEP_ALIVE = "Keep alive:";
     public static final Integer PORT = 5000;
     public static final Integer STANDARD_ADDITION_TIME = 10;
-    public static final Integer STANDARD_DECREASE_TIME = 1;
 
     private final Lock lock = new ReentrantLock();
 
@@ -93,7 +92,7 @@ public class SuperNode {
                 String treatedData = received.replace("My data: ", "");
                 Resource resource = gson.fromJson(treatedData, Resource.class);
                 resources.add(resource);
-                registeredIps.put(resource.getIp(), 10);
+                registeredIps.put(resource.getIp(), 20);
             }
 
             public void requestToSupernodes(String received) throws IOException {
@@ -151,11 +150,7 @@ public class SuperNode {
                                 InetAddress.getByName(requestingIp),
                                 PORT);
                         unicastSocket.send(unicastPacket);
-                        try {
-                            Thread.sleep(112);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+
                     }
                 }
             }
@@ -180,7 +175,9 @@ public class SuperNode {
     }
 
     private synchronized void addTimestampToPeer(String ip) {
+        System.out.println("adding time to ip " + ip);
         Integer value = registeredIps.get(ip);
+        System.out.println("value: " + value);
         if (value != null)
             registeredIps.put(ip, value + STANDARD_ADDITION_TIME);
         else
@@ -196,9 +193,12 @@ public class SuperNode {
 
             for (String key : keyList) {
                 Integer currentTime = registeredIps.get(key);
-                currentTime = currentTime - STANDARD_DECREASE_TIME;
-
+                if(currentTime == null)
+                    continue;
+                currentTime--;
+                System.out.println("ip : " + key + "has still : " + currentTime);
                 if (currentTime == 0) {
+                    System.out.println("ip : " + key + "has now zero");
                     registeredIps.remove(key);
                     resources.removeIf(resource -> resource.getIp().equals(key));
                     continue;

@@ -44,6 +44,7 @@ public class Peer {
             try {
                 this.socket.setSoTimeout(3000);
                 this.socket.receive(packet);
+                socket.getReceiveBufferSize();
                 String received = new String(packet.getData(), 0, packet.getLength());
                 System.out.println("Received: " + received);
             } catch (SocketTimeoutException e) {
@@ -77,13 +78,15 @@ public class Peer {
             while (true) {
                 try {
                     Thread.sleep(5000);
-                    sendMessageToSuperNode("Keep alive: " + ip);
+                    sendMessageToSuperNode("Keep alive:" + ip);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
     }
+
+
 
     public void sendMessageToSuperNode(String message) throws IOException {
         byte[] output = message.getBytes();
