@@ -101,7 +101,13 @@ public class Peer {
                     if (received.contains(REQUEST_CODE)) {
                         String[] data = received.replace(REQUEST_CODE, "").split("###");
                         sendResponseToPeer(data[0], data[1], data[2]);
-                    } else
+                    } else if(received.contains(RESPONSE_CODE) && !received.contains("No resource with name:")) {
+                        String treatedReceive = received.substring(received.indexOf("{"));
+                        ResourceStorage resourceStorage = new Gson().fromJson(treatedReceive, ResourceStorage.class);
+                        System.out.println(String.format("Received from %s, resource of name %s with content \n %s",
+                                resourceStorage.getIp(), resourceStorage.getFileName(), resourceStorage.getFileContent()));
+                    }
+                    else
                         System.out.println("Received: " + received);
                 } catch (SocketTimeoutException e) {
                     System.out.println("Resource(s) not found in network");
@@ -128,6 +134,7 @@ public class Peer {
         String[] data = request.split(" ");
         String treatedRequest = REQUEST_CODE + data[0] + "###" + data[1] + "###" + ip;
         byte[] output = treatedRequest.getBytes();
+        sendSocket.setSoTimeout(3000);
         DatagramPacket datagramPacket = new DatagramPacket(
                 output,
                 output.length,
