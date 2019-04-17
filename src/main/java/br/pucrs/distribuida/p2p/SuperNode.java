@@ -2,18 +2,16 @@ package br.pucrs.distribuida.p2p;
 
 import com.google.gson.Gson;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.util.HashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 public class SuperNode {
 
@@ -23,6 +21,8 @@ public class SuperNode {
 
     public static final String KEEP_ALIVE = "Keep alive:";
     public static final Integer PORT = 5000;
+    public static final Integer STANDARD_ADDITION_TIME = 10;
+    public static final Integer STANDARD_DECREASE_TIME = 1;
 
     private final Lock lock = new ReentrantLock();
 
@@ -43,7 +43,7 @@ public class SuperNode {
         this.group = InetAddress.getByName("230.0.0.1");
         multicastSocket.joinGroup(this.group);
         unicastSocket = new DatagramSocket();
-        registeredIps = new HashMap<>();
+        registeredIps = Collections.synchronizedMap(new HashMap<>());
         byte[] input = new byte[256];
         packet = new DatagramPacket(input, input.length);
     }
@@ -75,11 +75,9 @@ public class SuperNode {
                             responseToPeer(received);
 
                         } else if (received.contains(KEEP_ALIVE)) {
-                            System.out.println("KEEP ALIVE FUNCIONOU");
                         }
                         // Se recebe uma requisição do Peer
                         else {
-                            System.out.println("BUSCA BOMBOU");
                             requestToSupernodes(received);
                         }
                     } catch (IOException e) {
@@ -150,6 +148,11 @@ public class SuperNode {
                                 InetAddress.getByName(requestingIp),
                                 PORT);
                         unicastSocket.send(unicastPacket);
+                        try{
+                        Thread.sleep(112);}
+                        catch (Exception e){
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
@@ -166,10 +169,40 @@ public class SuperNode {
 
         for (Resource resource : resources) {
             System.out.println(resource.toString());
-            if(resource.getFileName().equals(resourceName))
+            if (resource.getFileName().equals(resourceName))
                 foundResources.add(resource);
         }
 
         return foundResources;
+    }
+
+    private synchronized void addTimestampToPeer(String ip) {
+        Integer value = registeredIps.get(ip);
+        if (value != null)
+            registeredIps.put(ip, value + STANDARD_ADDITION_TIME);
+        else
+            registeredIps.put(ip, value);
+
+    }
+
+    private synchronized void decreaseTime() {
+        if (!registeredIps.isEmpty()) {
+            List<String> keyList = registeredIps.keySet()
+                    .stream()
+                    .collect(Collectors.toList());
+
+            for (String key : keyList) {
+                Integer currentTime = registeredIps.get(key);
+                currentTime = currentTime - STANDARD_DECREASE_TIME;
+
+                if (currentTime == 0) {
+                    registeredIps.remove(key);
+                    resources.removeIf(resource -> resource.getIp().equals(key));
+                    continue;
+                }
+                registeredIps.put(key, currentTime);
+            }
+
+        }
     }
 }
