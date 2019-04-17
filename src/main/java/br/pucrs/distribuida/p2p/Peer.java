@@ -22,6 +22,8 @@ public class Peer {
     private DatagramSocket socket;
     private DatagramPacket packet;
 
+    private static final String PATH = "/opt/files";
+
     public Peer(String ip, String fileName, String hash, String ipSuperNode) throws IOException {
         this.ip = ip;
         this.fileName = fileName;
@@ -34,7 +36,7 @@ public class Peer {
         this.declareToSuperNode().start();
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.println("Inform the resources you're looking for divided in single white spaces: ");
+            //System.out.println("Inform the resources you're looking for divided in single white spaces: ");
             String msg = scanner.nextLine() + " " + ip;
             this.sendMessageToSuperNode(msg);
             byte[] input = new byte[256];
@@ -51,7 +53,7 @@ public class Peer {
     }
 
     public List<Resource> getFileHashes() throws NoSuchAlgorithmException, FileNotFoundException {
-        File folder = new File("/opt/files");
+        File folder = new File(PATH);
         File[] listOfFiles = folder.listFiles();
         List<Resource> resourceList = new ArrayList<>();
         for (File file : listOfFiles) {
@@ -74,7 +76,7 @@ public class Peer {
             }
             while (true) {
                 try {
-                    Thread.sleep(50000);
+                    Thread.sleep(5000);
                     sendMessageToSuperNode("Keep alive: " + ip);
                 } catch (Exception e) {
                     e.printStackTrace();

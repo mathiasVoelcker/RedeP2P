@@ -50,6 +50,7 @@ public class SuperNode {
 
     public void run() {
         listenMulticast().start();
+        managePeers().start();
     }
 
     private Thread listenMulticast() {
@@ -75,6 +76,8 @@ public class SuperNode {
                             responseToPeer(received);
 
                         } else if (received.contains(KEEP_ALIVE)) {
+                            String ip = received.replace(KEEP_ALIVE, "");
+                            addTimestampToPeer(ip);
                         }
                         // Se recebe uma requisição do Peer
                         else {
@@ -97,7 +100,7 @@ public class SuperNode {
 
                 String[] data = received.split(" ");
                 String ip = data[data.length - 1];
-                for (int i = 0; i < data.length - 2; i++) {
+                for (int i = 0; i < data.length - 1; i++) {
                     String msg = SUPERNODE_REQUEST_CODE + data[i] + "###" + ip;
                     System.out.println(msg);
                     byte[] output = msg.getBytes();
@@ -148,9 +151,9 @@ public class SuperNode {
                                 InetAddress.getByName(requestingIp),
                                 PORT);
                         unicastSocket.send(unicastPacket);
-                        try{
-                        Thread.sleep(112);}
-                        catch (Exception e){
+                        try {
+                            Thread.sleep(112);
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
@@ -204,5 +207,22 @@ public class SuperNode {
             }
 
         }
+    }
+
+    private Thread managePeers() {
+        return new Thread() {
+            @Override
+            public void run() {
+                while (true) {
+                    decreaseTime();
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+        };
     }
 }
